@@ -1,0 +1,10 @@
+//difference(){
+$quality = 100;
+union(){
+    linear_extrude(height=50, translate(h) = [sin(h)*5, 0]){
+      square( size = [3, 3] );
+    }
+    linear_extrude(height=50){
+      square( size = [3, 3] ); 
+    }
+}
