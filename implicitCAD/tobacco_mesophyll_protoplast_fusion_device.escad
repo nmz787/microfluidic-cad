@@ -16,9 +16,13 @@ module single_output_port(radius_from_center, output_port_diameter, angle)
 }
 
 
-module radial_outlets(distance_output_port_from_center, output_port_diameter, input_port_diameter, num_output_ports, duty=1/2, arcdiff=1/5)
+module radial_outlets(input_port_diameter,
+                      len_funnel,
+                      length_catcher,
+                      output_port_diameter,
+                      num_output_ports)
 {
-  radius_from_center=distance_output_port_from_center;
+  radius_from_center=(input_port_diameter/2) + len_funnel + length_catcher;
   union() {
     
 
@@ -244,14 +248,11 @@ module radial_columns(symmetric_bifurcation_start_radius,
                       catcher_post_h,
                       catcher_post_roundness,
                       catcher_post_pitch,
-                      num_output_ports)
-{  
-  num_posts_across_min = input_symmetric_bifurcation_inner_width / symmetric_bifurcation_post_pitch;
-  num_posts_across_max = input_symmetric_bifurcation_outer_width / symmetric_bifurcation_post_pitch;
-  
-  num_rows=(num_posts_across_max - num_posts_across_min)/2;
-  len_funnel = num_rows*symmetric_bifurcation_post_pitch;
-
+                      num_output_ports,
+                      num_posts_across_min,
+                      num_rows,
+                      len_funnel)
+{
   union(){
     for( angle = [ 1: 1: num_output_ports] ) 
     {
@@ -289,6 +290,111 @@ module radial_columns(symmetric_bifurcation_start_radius,
   }
 }
 
+
+module protoplast_bottom_layer_2d(input_port_diameter,
+                                  input_symmetric_bifurcation_inner_width,
+                                  input_symmetric_bifurcation_outer_width,
+                                  symmetric_bifurcation_post_w,
+                                  symmetric_bifurcation_post_h,
+                                  symmetric_bifurcation_post_roundness,
+                                  symmetric_bifurcation_post_pitch,
+                                  length_catcher,
+                                  width_catcher,
+                                  catcher_post_w,
+                                  catcher_post_h,
+                                  catcher_post_roundness,
+                                  catcher_post_pitch,
+                                  distance_output_port_from_center,
+                                  dist_center_catcher_to_center_device,
+                                  io_height,
+                                  protoplast_chamber_height,
+                                  output_port_diameter,
+                                  num_output_ports)
+{
+  union() 
+  {
+    radial_center_input(input_port_diameter,
+                        num_output_ports,
+                        input_symmetric_bifurcation_inner_width);
+    
+    num_posts_across_min = input_symmetric_bifurcation_inner_width / symmetric_bifurcation_post_pitch;
+    num_posts_across_max = input_symmetric_bifurcation_outer_width / symmetric_bifurcation_post_pitch;
+    
+    num_rows=(num_posts_across_max - num_posts_across_min)/2;
+    len_funnel = num_rows*symmetric_bifurcation_post_pitch;
+
+    radial_columns(input_port_diameter/2,
+                   input_symmetric_bifurcation_inner_width,
+                   input_symmetric_bifurcation_outer_width,
+                   symmetric_bifurcation_post_w,
+                   symmetric_bifurcation_post_h,
+                   symmetric_bifurcation_post_roundness,
+                   symmetric_bifurcation_post_pitch,
+                   length_catcher,
+                   width_catcher,
+                   catcher_post_w,
+                   catcher_post_h,
+                   catcher_post_roundness,
+                   catcher_post_pitch,
+                   num_output_ports,
+                   num_posts_across_min,
+                   num_rows,
+                   len_funnel);
+    
+    radial_outlets(input_port_diameter,
+                   len_funnel,
+                   length_catcher,
+                   output_port_diameter,
+                   num_output_ports,
+                   0.5,
+                   0.1);
+  }
+}
+
+
+module protoplast_io(input_port_diameter,
+                     input_symmetric_bifurcation_inner_width,
+                     input_symmetric_bifurcation_outer_width,
+                     symmetric_bifurcation_post_w,
+                     symmetric_bifurcation_post_h,
+                     symmetric_bifurcation_post_roundness,
+                     symmetric_bifurcation_post_pitch,
+                     length_catcher,
+                     width_catcher,
+                     catcher_post_w,
+                     catcher_post_h,
+                     catcher_post_roundness,
+                     catcher_post_pitch,
+                     distance_output_port_from_center,
+                     dist_center_catcher_to_center_device,
+                     io_height,
+                     protoplast_chamber_height,
+                     output_port_diameter,
+                     num_output_ports)
+{
+  union()
+  {  
+    radial_center_input(input_port_diameter,
+                        num_output_ports,
+                        input_symmetric_bifurcation_inner_width);
+    
+    num_posts_across_min = input_symmetric_bifurcation_inner_width / symmetric_bifurcation_post_pitch;
+    num_posts_across_max = input_symmetric_bifurcation_outer_width / symmetric_bifurcation_post_pitch;
+    
+    num_rows=(num_posts_across_max - num_posts_across_min)/2;
+    len_funnel = num_rows*symmetric_bifurcation_post_pitch;
+
+    radial_outlets(input_port_diameter,
+                   len_funnel,
+                   length_catcher,
+                   output_port_diameter,
+                   num_output_ports,
+                   0.5,
+                   0.1);
+  }
+}
+
+
 module tobacco_mesophyll_protoplast_fusion_device(input_port_diameter,
                                                   input_symmetric_bifurcation_inner_width,
                                                   input_symmetric_bifurcation_outer_width,
@@ -309,46 +415,56 @@ module tobacco_mesophyll_protoplast_fusion_device(input_port_diameter,
                                                   output_port_diameter,
                                                   num_output_ports)
 {
-  /*
   difference()
   {
     linear_extrude(io_height)
     {
       pdms_slab(distance_output_port_from_center);
     }
-    */
-    union() {  
-      //linear_extrude(io_height)
-      //{
-      //  radial_outlets(distance_output_port_from_center, output_port_diameter, input_port_diameter, num_output_ports, 0.5, 0.1);
-      //}
-      //linear_extrude(protoplast_chamber_height)
-      //{
-        //radial_outlets(distance_output_port_from_center, output_port_diameter, input_port_diameter, num_output_ports, 0.5, 0.1);
-        radial_center_input(input_port_diameter,
-                            num_output_ports,
-                            input_symmetric_bifurcation_inner_width);
-        
-        radial_columns(input_port_diameter/2,
-                       input_symmetric_bifurcation_inner_width,
-                       input_symmetric_bifurcation_outer_width,
-                       symmetric_bifurcation_post_w,
-                       symmetric_bifurcation_post_h,
-                       symmetric_bifurcation_post_roundness,
-                       symmetric_bifurcation_post_pitch,
-                       length_catcher,
-                       width_catcher,
-                       catcher_post_w,
-                       catcher_post_h,
-                       catcher_post_roundness,
-                       catcher_post_pitch,
-                       num_output_ports);
-      
-      }
-      /*
+    union()
+    {
+      linear_extrude(protoplast_chamber_height)
+        protoplast_bottom_layer_2d(input_port_diameter,
+                                   input_symmetric_bifurcation_inner_width,
+                                   input_symmetric_bifurcation_outer_width,
+                                   symmetric_bifurcation_post_w,
+                                   symmetric_bifurcation_post_h,
+                                   symmetric_bifurcation_post_roundness,
+                                   symmetric_bifurcation_post_pitch,
+                                   length_catcher,
+                                   width_catcher,
+                                   catcher_post_w,
+                                   catcher_post_h,
+                                   catcher_post_roundness,
+                                   catcher_post_pitch,
+                                   distance_output_port_from_center,
+                                   dist_center_catcher_to_center_device,
+                                   io_height,
+                                   protoplast_chamber_height,
+                                   output_port_diameter,
+                                   num_output_ports);
+      linear_extrude(io_height)
+        protoplast_io(input_port_diameter,
+                      input_symmetric_bifurcation_inner_width,
+                      input_symmetric_bifurcation_outer_width,
+                      symmetric_bifurcation_post_w,
+                      symmetric_bifurcation_post_h,
+                      symmetric_bifurcation_post_roundness,
+                      symmetric_bifurcation_post_pitch,
+                      length_catcher,
+                      width_catcher,
+                      catcher_post_w,
+                      catcher_post_h,
+                      catcher_post_roundness,
+                      catcher_post_pitch,
+                      distance_output_port_from_center,
+                      dist_center_catcher_to_center_device,
+                      io_height,
+                      protoplast_chamber_height,
+                      output_port_diameter,
+                      num_output_ports);
     }
   }
-  */
 }
 
 
